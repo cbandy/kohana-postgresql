@@ -101,7 +101,7 @@ class Kohana_Database_PostgreSQL extends Database {
 			throw new Database_Exception(pg_last_error($this->_connection));
 	}
 
-	public function query($type, $sql, $as_object)
+	public function query($type, $sql, $return)
 	{
 		$this->_connection or $this->connect();
 
@@ -113,6 +113,11 @@ class Kohana_Database_PostgreSQL extends Database {
 
 		try
 		{
+			if ($type === Database::INSERT AND $return)
+			{
+				$sql .= ' RETURNING '.$this->quote_identifier($return);
+			}
+
 			if ( ! pg_send_query($this->_connection, $sql))
 				throw new Database_Exception(':error [ :query ]',
 					array(':error' => pg_last_error($this->_connection), ':query' => $sql));
@@ -152,19 +157,16 @@ class Kohana_Database_PostgreSQL extends Database {
 			$this->last_query = $sql;
 
 			if ($type === Database::SELECT)
-				return new Database_PostgreSQL_Result($result, $sql, $as_object, $rows);
+				return new Database_PostgreSQL_Result($result, $sql, $return, $rows);
 
-			if ($type === Database::INSERT)
+			if ($type === Database::INSERT AND $return)
 			{
-				if ($insert_id = pg_send_query($this->_connection, 'SELECT LASTVAL()'))
+				if ($rows > 1)
 				{
-					if ($result = pg_get_result($this->_connection) AND pg_result_status($result) === PGSQL_TUPLES_OK)
-					{
-						$insert_id = pg_fetch_result($result, 0);
-					}
+					pg_result_seek($result, $rows - 1);
 				}
 
-				return array($insert_id, $rows);
+				return array(pg_fetch_result($result, 0), $rows);
 			}
 
 			return $rows;
