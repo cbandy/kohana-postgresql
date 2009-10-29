@@ -236,7 +236,23 @@ class Kohana_Database_PostgreSQL extends Database {
 
 		$sql .= ' ORDER BY ordinal_position';
 
-		return $this->query(Database::SELECT, $sql, FALSE)->as_array();
+		$result = array();
+
+		foreach ($this->query(Database::SELECT, $sql, FALSE) as $column)
+		{
+			if (isset(Database_PostgreSQL::$_types[$column['data_type']]))
+			{
+				$column = array_merge(Database_PostgreSQL::$_types[$column['data_type']], $column);
+			}
+			elseif (isset(Database::$_types[$column['data_type']]))
+			{
+				$column = array_merge(Database::$_types[$column['data_type']], $column);
+			}
+
+			$result[] = $column;
+		}
+
+		return $result;
 	}
 
 	public function schema()
