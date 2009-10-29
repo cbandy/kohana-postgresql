@@ -184,27 +184,23 @@ class Kohana_Database_PostgreSQL extends Database {
 	{
 		$this->_connection or $this->connect();
 
-		$sql = 'SELECT table_name FROM information_schema.tables WHERE table_schema = '.$this->quote($this->schema());
+		$sql = 'SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = '.$this->quote($this->schema());
 
 		if (is_string($like))
 		{
 			$sql .= ' AND table_name LIKE '.$this->quote($like);
 		}
 
-		$result = array();
-		foreach ($this->query(Database::SELECT, $sql, FALSE) as $row)
-		{
-			$result[] = $row['table_name'];
-		}
-
-		return $result;
+		return $this->query(Database::SELECT, $sql, FALSE)->as_array();
 	}
 
 	public function list_columns($table, $like = NULL)
 	{
 		$this->_connection or $this->connect();
 
-		$sql = 'SELECT column_name FROM information_schema.columns WHERE table_schema = '.$this->quote($this->schema()).' AND table_name = '.$this->quote($table);
+		$sql = 'SELECT column_name, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, datetime_precision'
+			.' FROM information_schema.columns'
+			.' WHERE table_schema = '.$this->quote($this->schema()).' AND table_name = '.$this->quote($table);
 
 		if (is_string($like))
 		{
@@ -213,13 +209,7 @@ class Kohana_Database_PostgreSQL extends Database {
 
 		$sql .= ' ORDER BY ordinal_position';
 
-		$result = array();
-		foreach ($this->query(Database::SELECT, $sql, FALSE) as $row)
-		{
-			$result[] = $row['column_name'];
-		}
-
-		return $result;
+		return $this->query(Database::SELECT, $sql, FALSE)->as_array();
 	}
 
 	public function schema()
