@@ -8,6 +8,33 @@ class Kohana_Database_PostgreSQL extends Database {
 
 	protected $_version;
 
+	protected static $_types = array
+	(
+		// PostgreSQL >= 7.4
+		'box'   => array('type' => 'string'),
+		'bytea' => array('type' => 'string', 'binary' => TRUE),
+		'cidr'  => array('type' => 'string'),
+		'circle' => array('type' => 'string'),
+		'inet'  => array('type' => 'string'),
+		'int2'  => array('type' => 'int', 'min' => '-32768', 'max' => '32767'),
+		'int4'  => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647'),
+		'int8'  => array('type' => 'int', 'min' => '-9223372036854775808', 'max' => '9223372036854775807'),
+		'line'  => array('type' => 'string'),
+		'lseg'  => array('type' => 'string'),
+		'macaddr' => array('type' => 'string'),
+		'money' => array('type' => 'float', 'exact' => TRUE, 'min' => '-92233720368547758.08', 'max' => '92233720368547758.07'),
+		'path'  => array('type' => 'string'),
+		'polygon' => array('type' => 'string'),
+		'point' => array('type' => 'string'),
+		'text'  => array('type' => 'string'),
+
+		// PostgreSQL >= 8.3
+		'tsquery' => array('type' => 'string'),
+		'tsvector' => array('type' => 'string'),
+		'uuid'  => array('type' => 'string'),
+		'xml'   => array('type' => 'string'),
+	);
+
 	public function connect()
 	{
 		if ($this->_connection)
