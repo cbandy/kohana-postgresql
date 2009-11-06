@@ -191,13 +191,7 @@ class Kohana_Database_PostgreSQL extends Database {
 			$sql .= ' AND table_name LIKE '.$this->quote($like);
 		}
 
-		$result = array();
-		foreach ($this->query(Database::SELECT, $sql, FALSE) as $row)
-		{
-			$result[] = $row['table_name'];
-		}
-
-		return $result;
+		return $this->query(Database::SELECT, $sql, FALSE)->as_array(NULL, 'table_name');
 	}
 
 	public function list_columns($table, $like = NULL)
@@ -213,13 +207,7 @@ class Kohana_Database_PostgreSQL extends Database {
 
 		$sql .= ' ORDER BY ordinal_position';
 
-		$result = array();
-		foreach ($this->query(Database::SELECT, $sql, FALSE) as $row)
-		{
-			$result[] = $row['column_name'];
-		}
-
-		return $result;
+		return $this->query(Database::SELECT, $sql, FALSE)->as_array(NULL, 'column_name');
 	}
 
 	public function schema()
