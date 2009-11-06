@@ -227,18 +227,6 @@ class Kohana_Database_PostgreSQL extends Database {
 		return $this->_config['schema'];
 	}
 
-	public function quote($value)
-	{
-		// This SQL-92 format works in boolean and integer columns
-		if ($value === TRUE)
-			return "'1'";
-
-		if ($value === FALSE)
-			return "'0'";
-
-		return parent::quote($value);
-	}
-
 	public function escape($value)
 	{
 		$this->_connection or $this->connect();
