@@ -9,7 +9,7 @@ return array
 			/**
 			 * The following options are available for PostgreSQL:
 			 *
-			 * string   info        @link http://www.postgresql.org/docs/8.3/static/libpq-connect.html
+			 * string   info        @link http://www.postgresql.org/docs/current/static/libpq-connect.html
 			 * string   hostname    NULL to use default domain socket
 			 * integer  port
 			 * string   username
@@ -24,6 +24,7 @@ return array
 			'persistent' => FALSE,
 			'database'   => 'kohana',
 		),
+		'primary_key'  => '',   // Column to return from INSERT queries, see #2188 and #2273
 		'schema'       => '',
 		'table_prefix' => '',
 		'charset'      => 'utf8',

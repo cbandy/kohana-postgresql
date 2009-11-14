@@ -113,6 +113,11 @@ class Kohana_Database_PostgreSQL extends Database {
 
 		try
 		{
+			if ($type === Database::INSERT AND $this->_config['primary_key'])
+			{
+				$sql .= ' RETURNING '.$this->quote_identifier($this->_config['primary_key']);
+			}
+
 			if ( ! pg_send_query($this->_connection, $sql))
 				throw new Database_Exception(':error [ :query ]',
 					array(':error' => pg_last_error($this->_connection), ':query' => $sql));
@@ -156,7 +161,16 @@ class Kohana_Database_PostgreSQL extends Database {
 
 			if ($type === Database::INSERT)
 			{
-				if ($insert_id = pg_send_query($this->_connection, 'SELECT LASTVAL()'))
+				if ($this->_config['primary_key'])
+				{
+					if ($rows > 1)
+					{
+						pg_result_seek($result, $rows - 1);
+					}
+
+					$insert_id = pg_fetch_result($result, 0);
+				}
+				elseif ($insert_id = pg_send_query($this->_connection, 'SELECT LASTVAL()'))
 				{
 					if ($result = pg_get_result($this->_connection) AND pg_result_status($result) === PGSQL_TUPLES_OK)
 					{
