@@ -15,7 +15,7 @@ class Kohana_Database_PostgreSQL extends Database {
 
 		extract($this->_config['connection']);
 
-		if ( ! isset($info) OR ! $info)
+		if (empty($info))
 		{
 			// Build connection string
 			$info = isset($hostname) ? "host='$hostname'" : '';
