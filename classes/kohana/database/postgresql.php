@@ -211,14 +211,14 @@ class Kohana_Database_PostgreSQL extends Database {
 	{
 		$this->_connection or $this->connect();
 
-		$sql = 'SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = '.$this->quote($this->schema());
+		$sql = 'SELECT table_name FROM information_schema.tables WHERE table_schema = '.$this->quote($this->schema());
 
 		if (is_string($like))
 		{
 			$sql .= ' AND table_name LIKE '.$this->quote($like);
 		}
 
-		return $this->query(Database::SELECT, $sql, FALSE)->as_array();
+		return $this->query(Database::SELECT, $sql, FALSE)->as_array(NULL, 'table_name');
 	}
 
 	public function list_columns($table, $like = NULL)
@@ -248,6 +248,8 @@ class Kohana_Database_PostgreSQL extends Database {
 			{
 				$column = array_merge(Database::$_types[$column['data_type']], $column);
 			}
+
+			$column['is_nullable'] = ($column['is_nullable'] === 'YES');
 
 			$result[] = $column;
 		}
