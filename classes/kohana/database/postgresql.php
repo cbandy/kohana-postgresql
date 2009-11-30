@@ -251,7 +251,7 @@ class Kohana_Database_PostgreSQL extends Database {
 
 			$column['is_nullable'] = ($column['is_nullable'] === 'YES');
 
-			$result[] = $column;
+			$result[$column['column_name']] = $column;
 		}
 
 		return $result;
