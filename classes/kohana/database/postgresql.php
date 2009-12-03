@@ -231,9 +231,26 @@ class Kohana_Database_PostgreSQL extends Database {
 		return $this->_command('COMMIT');
 	}
 
-	public function rollback()
+	/**
+	 * Abort the current transaction or roll back to a savepoint
+	 *
+	 * @param   string  Savepoint name
+	 * @return  boolean
+	 */
+	public function rollback($savepoint = NULL)
 	{
-		return $this->_command('ROLLBACK');
+		return $this->_command($savepoint ? "ROLLBACK TO $savepoint" : 'ROLLBACK');
+	}
+
+	/**
+	 * Define a new savepoint in the current transaction
+	 *
+	 * @param   string  Savepoint name
+	 * @return  boolean
+	 */
+	public function savepoint($name)
+	{
+		return $this->_command("SAVEPOINT $name");
 	}
 
 	public function list_tables($like = NULL)
