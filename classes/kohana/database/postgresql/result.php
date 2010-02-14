@@ -53,7 +53,12 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result {
 	public function as_array($key = NULL, $value = NULL)
 	{
 		if ( ! $this->_as_object AND $key === NULL AND $value === NULL)
+		{
+			// Rewind
+			$this->_current_row = 0;
+
 			return pg_fetch_all($this->_result);
+		}
 
 		return parent::as_array($key, $value);
 	}
