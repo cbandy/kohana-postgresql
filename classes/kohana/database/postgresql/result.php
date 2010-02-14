@@ -10,6 +10,11 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result
 	{
 		parent::__construct($result, $sql, $as_object);
 
+		if ($as_object === TRUE)
+		{
+			$this->_as_object = 'stdClass';
+		}
+
 		if ($total_rows !== NULL)
 		{
 			$this->_total_rows = $total_rows;
@@ -92,10 +97,7 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result
 		if ( ! $this->_as_object)
 			return pg_fetch_assoc($this->_result, $this->_current_row);
 
-		if (is_string($this->_as_object))
-			return pg_fetch_object($this->_result, $this->_current_row, $this->_as_object);
-
-		return pg_fetch_object($this->_result, $this->_current_row);
+		return pg_fetch_object($this->_result, $this->_current_row, $this->_as_object);
 	}
 
 }
