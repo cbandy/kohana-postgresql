@@ -163,12 +163,8 @@ class Kohana_Database_PostgreSQL extends Database {
 			{
 				if ($this->_config['primary_key'])
 				{
-					if ($rows > 1)
-					{
-						pg_result_seek($result, $rows - 1);
-					}
-
-					$insert_id = pg_fetch_result($result, 0);
+					// Fetch the first column of the last row
+					$insert_id = pg_fetch_result($result, $rows - 1, 0);
 				}
 				elseif ($insert_id = pg_send_query($this->_connection, 'SELECT LASTVAL()'))
 				{

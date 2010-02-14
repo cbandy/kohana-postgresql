@@ -4,10 +4,8 @@
  *
  * @package PostgreSQL
  */
-class Kohana_Database_PostgreSQL_Result extends Database_Result {
-
-	protected $_internal_row = 0;
-
+class Kohana_Database_PostgreSQL_Result extends Database_Result
+{
 	public function __construct($result, $sql, $as_object, $total_rows = NULL)
 	{
 		parent::__construct($result, $sql, $as_object);
@@ -66,14 +64,12 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result {
 	 */
 	public function seek($offset)
 	{
-		if ($this->offsetExists($offset) AND pg_result_seek($this->_result, $offset))
-		{
-			$this->_current_row = $this->_internal_row = $offset;
+		if ( ! $this->offsetExists($offset))
+			return FALSE;
 
-			return TRUE;
-		}
+		$this->_current_row = $offset;
 
-		return FALSE;
+		return TRUE;
 	}
 
 	/**
@@ -81,19 +77,16 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result {
 	 */
 	public function current()
 	{
-		if ($this->_current_row !== $this->_internal_row AND ! $this->seek($this->_current_row))
+		if ( ! $this->offsetExists($this->_current_row))
 			return FALSE;
 
-		// Track the row that will be returned by pg_fetch_* after the below call to pg_fetch_*
-		++$this->_internal_row;
-
 		if ( ! $this->_as_object)
-			return pg_fetch_assoc($this->_result);
+			return pg_fetch_assoc($this->_result, $this->_current_row);
 
 		if (is_string($this->_as_object))
 			return pg_fetch_object($this->_result, $this->_current_row, $this->_as_object);
 
-		return pg_fetch_object($this->_result);
+		return pg_fetch_object($this->_result, $this->_current_row);
 	}
 
 }
