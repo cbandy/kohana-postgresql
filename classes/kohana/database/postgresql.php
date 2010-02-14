@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * PostgreSQL database connection.
+ * PostgreSQL database connection using the native driver.
  *
  * @package PostgreSQL
  */
@@ -8,47 +8,59 @@ class Kohana_Database_PostgreSQL extends Database
 {
 	protected $_version;
 
+	/**
+	 * Build the connection string represented by $this->_config['connection']
+	 *
+	 * @return  string
+	 */
+	protected function _connection_string()
+	{
+		if ( ! empty($this->_config['connection']['info']))
+			return $this->_config['connection']['info'];
+
+		extract($this->_config['connection']);
+
+		$result = isset($hostname) ? "host='$hostname'" : '';
+		$result .= isset($port) ? " port='$port'" : '';
+		$result .= isset($username) ? " user='$username'" : '';
+		$result .= isset($password) ? " password='$password'" : '';
+		$result .= isset($database) ? " dbname='$database'" : '';
+
+		if (isset($ssl))
+		{
+			if ($ssl === TRUE)
+			{
+				$result .= " sslmode='require'";
+			}
+			elseif ($ssl === FALSE)
+			{
+				$result .= " sslmode='disable'";
+			}
+			else
+			{
+				$result .= " sslmode='$ssl'";
+			}
+		}
+
+		return $result;
+	}
+
 	public function connect()
 	{
 		if ($this->_connection)
 			return;
 
-		extract($this->_config['connection']);
-
-		if (empty($info))
-		{
-			// Build connection string
-			$info = isset($hostname) ? "host='$hostname'" : '';
-			$info .= isset($port) ? " port='$port'" : '';
-			$info .= isset($username) ? " user='$username'" : '';
-			$info .= isset($password) ? " password='$password'" : '';
-			$info .= isset($database) ? " dbname='$database'" : '';
-
-			if (isset($ssl))
-			{
-				if ($ssl === TRUE)
-				{
-					$info .= " sslmode='require'";
-				}
-				elseif ($ssl === FALSE)
-				{
-					$info .= " sslmode='disable'";
-				}
-				else
-				{
-					$info .= " sslmode='$ssl'";
-				}
-			}
-		}
+		$info = $this->_connection_string();
+		$persistent = ! empty($this->config['connection']['persistent']);
 
 		// Clear the connection parameters for security
 		unset($this->_config['connection']);
 
 		try
 		{
-			$this->_connection = empty($persistent)
-				? pg_connect($info, PGSQL_CONNECT_FORCE_NEW)
-				: pg_pconnect($info, PGSQL_CONNECT_FORCE_NEW);
+			$this->_connection = $persistent
+				? pg_pconnect($info, PGSQL_CONNECT_FORCE_NEW)
+				: pg_connect($info, PGSQL_CONNECT_FORCE_NEW);
 		}
 		catch (ErrorException $e)
 		{
