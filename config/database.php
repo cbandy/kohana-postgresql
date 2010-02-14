@@ -7,16 +7,23 @@ return array
 		'type'       => 'postgresql',
 		'connection' => array(
 			/**
-			 * The following options are available for PostgreSQL:
+			 * There are two ways to define a connection for PostgreSQL:
 			 *
-			 * string   info        @link http://www.postgresql.org/docs/current/static/libpq-connect.html
+			 * 1. Full connection string passed directly to pg_connect()
+			 *
+			 * string   info
+			 *
+			 * 2. Connection parameters:
+			 *
 			 * string   hostname    NULL to use default domain socket
-			 * integer  port
+			 * integer  port        NULL to use the default port
 			 * string   username
 			 * string   password
 			 * string   database
 			 * boolean  persistent
 			 * mixed    ssl         TRUE to require, FALSE to disable, or 'allow' to negotiate
+			 *
+			 * @link http://www.postgresql.org/docs/current/static/libpq-connect.html
 			 */
 			'hostname'   => 'localhost',
 			'username'   => NULL,
