@@ -4,7 +4,34 @@
  *
  * @package PostgreSQL
  */
-class Kohana_Database_PostgreSQL extends Database {
+class Kohana_Database_PostgreSQL extends Database
+{
+	protected static $_types = array
+	(
+		// PostgreSQL >= 7.4
+		'box'   => array('type' => 'string'),
+		'bytea' => array('type' => 'string', 'binary' => TRUE),
+		'cidr'  => array('type' => 'string'),
+		'circle' => array('type' => 'string'),
+		'inet'  => array('type' => 'string'),
+		'int2'  => array('type' => 'int', 'min' => '-32768', 'max' => '32767'),
+		'int4'  => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647'),
+		'int8'  => array('type' => 'int', 'min' => '-9223372036854775808', 'max' => '9223372036854775807'),
+		'line'  => array('type' => 'string'),
+		'lseg'  => array('type' => 'string'),
+		'macaddr' => array('type' => 'string'),
+		'money' => array('type' => 'float', 'exact' => TRUE, 'min' => '-92233720368547758.08', 'max' => '92233720368547758.07'),
+		'path'  => array('type' => 'string'),
+		'polygon' => array('type' => 'string'),
+		'point' => array('type' => 'string'),
+		'text'  => array('type' => 'string'),
+
+		// PostgreSQL >= 8.3
+		'tsquery' => array('type' => 'string'),
+		'tsvector' => array('type' => 'string'),
+		'uuid'  => array('type' => 'string'),
+		'xml'   => array('type' => 'string'),
+	);
 
 	protected $_version;
 
@@ -201,20 +228,16 @@ class Kohana_Database_PostgreSQL extends Database {
 			$sql .= ' AND table_name LIKE '.$this->quote($like);
 		}
 
-		$result = array();
-		foreach ($this->query(Database::SELECT, $sql, FALSE) as $row)
-		{
-			$result[] = $row['table_name'];
-		}
-
-		return $result;
+		return $this->query(Database::SELECT, $sql, FALSE)->as_array(NULL, 'table_name');
 	}
 
 	public function list_columns($table, $like = NULL)
 	{
 		$this->_connection or $this->connect();
 
-		$sql = 'SELECT column_name FROM information_schema.columns WHERE table_schema = '.$this->quote($this->schema()).' AND table_name = '.$this->quote($table);
+		$sql = 'SELECT column_name, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, datetime_precision'
+			.' FROM information_schema.columns'
+			.' WHERE table_schema = '.$this->quote($this->schema()).' AND table_name = '.$this->quote($table);
 
 		if (is_string($like))
 		{
@@ -224,9 +247,21 @@ class Kohana_Database_PostgreSQL extends Database {
 		$sql .= ' ORDER BY ordinal_position';
 
 		$result = array();
-		foreach ($this->query(Database::SELECT, $sql, FALSE) as $row)
+
+		foreach ($this->query(Database::SELECT, $sql, FALSE) as $column)
 		{
-			$result[] = $row['column_name'];
+			if (isset(Database_PostgreSQL::$_types[$column['data_type']]))
+			{
+				$column = array_merge(Database_PostgreSQL::$_types[$column['data_type']], $column);
+			}
+			elseif (isset(Database::$_types[$column['data_type']]))
+			{
+				$column = array_merge(Database::$_types[$column['data_type']], $column);
+			}
+
+			$column['is_nullable'] = ($column['is_nullable'] === 'YES');
+
+			$result[$column['column_name']] = $column;
 		}
 
 		return $result;
