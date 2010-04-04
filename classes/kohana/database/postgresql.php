@@ -6,33 +6,6 @@
  */
 class Kohana_Database_PostgreSQL extends Database
 {
-	protected static $_types = array
-	(
-		// PostgreSQL >= 7.4
-		'box'   => array('type' => 'string'),
-		'bytea' => array('type' => 'string', 'binary' => TRUE),
-		'cidr'  => array('type' => 'string'),
-		'circle' => array('type' => 'string'),
-		'inet'  => array('type' => 'string'),
-		'int2'  => array('type' => 'int', 'min' => '-32768', 'max' => '32767'),
-		'int4'  => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647'),
-		'int8'  => array('type' => 'int', 'min' => '-9223372036854775808', 'max' => '9223372036854775807'),
-		'line'  => array('type' => 'string'),
-		'lseg'  => array('type' => 'string'),
-		'macaddr' => array('type' => 'string'),
-		'money' => array('type' => 'float', 'exact' => TRUE, 'min' => '-92233720368547758.08', 'max' => '92233720368547758.07'),
-		'path'  => array('type' => 'string'),
-		'polygon' => array('type' => 'string'),
-		'point' => array('type' => 'string'),
-		'text'  => array('type' => 'string'),
-
-		// PostgreSQL >= 8.3
-		'tsquery' => array('type' => 'string'),
-		'tsvector' => array('type' => 'string'),
-		'uuid'  => array('type' => 'string'),
-		'xml'   => array('type' => 'string'),
-	);
-
 	protected $_version;
 
 	public function connect()
@@ -217,6 +190,41 @@ class Kohana_Database_PostgreSQL extends Database
 		}
 	}
 
+	public function datatype($type)
+	{
+		static $types = array
+		(
+			// PostgreSQL >= 7.4
+			'box'       => array('type' => 'string'),
+			'bytea'     => array('type' => 'string', 'binary' => TRUE),
+			'cidr'      => array('type' => 'string'),
+			'circle'    => array('type' => 'string'),
+			'inet'      => array('type' => 'string'),
+			'int2'      => array('type' => 'int', 'min' => '-32768', 'max' => '32767'),
+			'int4'      => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647'),
+			'int8'      => array('type' => 'int', 'min' => '-9223372036854775808', 'max' => '9223372036854775807'),
+			'line'      => array('type' => 'string'),
+			'lseg'      => array('type' => 'string'),
+			'macaddr'   => array('type' => 'string'),
+			'money'     => array('type' => 'float', 'exact' => TRUE, 'min' => '-92233720368547758.08', 'max' => '92233720368547758.07'),
+			'path'      => array('type' => 'string'),
+			'polygon'   => array('type' => 'string'),
+			'point'     => array('type' => 'string'),
+			'text'      => array('type' => 'string'),
+
+			// PostgreSQL >= 8.3
+			'tsquery'   => array('type' => 'string'),
+			'tsvector'  => array('type' => 'string'),
+			'uuid'      => array('type' => 'string'),
+			'xml'       => array('type' => 'string'),
+		);
+
+		if (isset($types[$type]))
+			return $types[$type];
+
+		return parent::datatype($type);
+	}
+
 	public function list_tables($like = NULL)
 	{
 		$this->_connection or $this->connect();
@@ -250,14 +258,7 @@ class Kohana_Database_PostgreSQL extends Database
 
 		foreach ($this->query(Database::SELECT, $sql, FALSE) as $column)
 		{
-			if (isset(Database_PostgreSQL::$_types[$column['data_type']]))
-			{
-				$column = array_merge(Database_PostgreSQL::$_types[$column['data_type']], $column);
-			}
-			elseif (isset(Database::$_types[$column['data_type']]))
-			{
-				$column = array_merge(Database::$_types[$column['data_type']], $column);
-			}
+			$column = array_merge($this->datatype($column['data_type']), $column);
 
 			$column['is_nullable'] = ($column['is_nullable'] === 'YES');
 
@@ -270,18 +271,6 @@ class Kohana_Database_PostgreSQL extends Database
 	public function schema()
 	{
 		return $this->_config['schema'];
-	}
-
-	public function quote($value)
-	{
-		// This SQL-92 format works in boolean and integer columns
-		if ($value === TRUE)
-			return "'1'";
-
-		if ($value === FALSE)
-			return "'0'";
-
-		return parent::quote($value);
 	}
 
 	public function escape($value)

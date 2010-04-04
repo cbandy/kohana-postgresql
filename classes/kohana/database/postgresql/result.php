@@ -60,6 +60,9 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result
 
 		if ( ! $this->_as_object AND $key === NULL)
 		{
+			// Rewind
+			$this->_current_row = 0;
+
 			if ($value === NULL)
 			{
 				// Indexed rows
