@@ -1,8 +1,12 @@
 <?php defined('SYSPATH') or die('No direct script access.');
+
 /**
  * PostgreSQL database result.
  *
- * @package PostgreSQL
+ * @package     PostgreSQL
+ * @author      Chris Bandy
+ * @copyright   (c) 2010 Chris Bandy
+ * @license     http://www.opensource.org/licenses/isc-license.txt
  */
 class Kohana_Database_PostgreSQL_Result extends Database_Result
 {

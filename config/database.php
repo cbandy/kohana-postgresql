@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 return array
 (
@@ -21,7 +21,7 @@ return array
 			 * string   password
 			 * string   database
 			 * boolean  persistent
-			 * mixed    ssl         TRUE to require, FALSE to disable, or 'allow' to negotiate
+			 * mixed    ssl         TRUE to require, FALSE to disable, or 'prefer' to negotiate
 			 *
 			 * @link http://www.postgresql.org/docs/current/static/libpq-connect.html
 			 */

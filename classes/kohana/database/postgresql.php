@@ -1,8 +1,12 @@
 <?php defined('SYSPATH') or die('No direct script access.');
+
 /**
  * PostgreSQL database connection.
  *
- * @package PostgreSQL
+ * @package     PostgreSQL
+ * @author      Chris Bandy
+ * @copyright   (c) 2010 Chris Bandy
+ * @license     http://www.opensource.org/licenses/isc-license.txt
  */
 class Kohana_Database_PostgreSQL extends Database
 {
@@ -190,6 +194,9 @@ class Kohana_Database_PostgreSQL extends Database
 		}
 	}
 
+	/**
+	 * @link http://www.postgresql.org/docs/current/static/datatype.html#DATATYPE-TABLE
+	 */
 	public function datatype($type)
 	{
 		static $types = array
@@ -208,8 +215,8 @@ class Kohana_Database_PostgreSQL extends Database
 			'macaddr'   => array('type' => 'string'),
 			'money'     => array('type' => 'float', 'exact' => TRUE, 'min' => '-92233720368547758.08', 'max' => '92233720368547758.07'),
 			'path'      => array('type' => 'string'),
-			'polygon'   => array('type' => 'string'),
 			'point'     => array('type' => 'string'),
+			'polygon'   => array('type' => 'string'),
 			'text'      => array('type' => 'string'),
 
 			// PostgreSQL >= 8.3
