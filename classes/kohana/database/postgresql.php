@@ -133,24 +133,25 @@ class Kohana_Database_PostgreSQL extends Database
 			// Check the result for errors
 			switch (pg_result_status($result))
 			{
-				case PGSQL_EMPTY_QUERY:
-					$rows = 0;
-				break;
 				case PGSQL_COMMAND_OK:
 					$rows = pg_affected_rows($result);
 				break;
 				case PGSQL_TUPLES_OK:
 					$rows = pg_num_rows($result);
 				break;
-				case PGSQL_COPY_OUT:
-				case PGSQL_COPY_IN:
-					throw new Database_Exception('PostgreSQL COPY operations not supported [ :query ]',
-						array(':query' => $sql));
 				case PGSQL_BAD_RESPONSE:
 				case PGSQL_NONFATAL_ERROR:
 				case PGSQL_FATAL_ERROR:
 					throw new Database_Exception(':error [ :query ]',
 						array(':error' => pg_result_error($result), ':query' => $sql));
+				case PGSQL_COPY_OUT:
+				case PGSQL_COPY_IN:
+					pg_end_copy($this->_connection);
+
+					throw new Database_Exception('PostgreSQL COPY operations not supported [ :query ]',
+						array(':query' => $sql));
+				default:
+					$rows = 0;
 			}
 
 			if (isset($benchmark))

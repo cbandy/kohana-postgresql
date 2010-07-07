@@ -27,24 +27,23 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result
 		{
 			switch (pg_result_status($result))
 			{
-				case PGSQL_EMPTY_QUERY:
-					$this->_total_rows = 0;
+				case PGSQL_TUPLES_OK:
+					$this->_total_rows = pg_num_rows($result);
 				break;
 				case PGSQL_COMMAND_OK:
 					$this->_total_rows = pg_affected_rows($result);
 				break;
-				case PGSQL_TUPLES_OK:
-					$this->_total_rows = pg_num_rows($result);
-				break;
-				case PGSQL_COPY_OUT:
-				case PGSQL_COPY_IN:
-					throw new Database_Exception('PostgreSQL COPY operations not supported [ :query ]',
-						array(':query' => $sql));
 				case PGSQL_BAD_RESPONSE:
 				case PGSQL_NONFATAL_ERROR:
 				case PGSQL_FATAL_ERROR:
 					throw new Database_Exception(':error [ :query ]',
 						array(':error' => pg_result_error($result), ':query' => $sql));
+				case PGSQL_COPY_OUT:
+				case PGSQL_COPY_IN:
+					throw new Database_Exception('PostgreSQL COPY operations not supported [ :query ]',
+						array(':query' => $sql));
+				default:
+					$this->_total_rows = 0;
 			}
 		}
 	}
