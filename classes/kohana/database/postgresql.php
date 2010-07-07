@@ -12,21 +12,41 @@ class Kohana_Database_PostgreSQL extends Database
 {
 	protected $_version;
 
-	public function connect()
+	protected function __construct($name, $config)
 	{
-		if ($this->_connection)
-			return;
+		parent::__construct($name, $config);
 
-		extract($this->_config['connection']);
-
-		if (empty($info))
+		if (empty($this->_config['connection']['info']))
 		{
 			// Build connection string
-			$info = isset($hostname) ? "host='$hostname'" : '';
-			$info .= isset($port) ? " port='$port'" : '';
-			$info .= isset($username) ? " user='$username'" : '';
-			$info .= isset($password) ? " password='$password'" : '';
-			$info .= isset($database) ? " dbname='$database'" : '';
+			$this->_config['connection']['info'] = '';
+
+			extract($this->_config['connection']);
+
+			if ( ! empty($hostname))
+			{
+				$info .= "host='$hostname'";
+			}
+
+			if ( ! empty($port))
+			{
+				$info .= " port='$port'";
+			}
+
+			if ( ! empty($username))
+			{
+				$info .= " user='$username'";
+			}
+
+			if ( ! empty($password))
+			{
+				$info .= " password='$password'";
+			}
+
+			if ( ! empty($database))
+			{
+				$info .= " dbname='$database'";
+			}
 
 			if (isset($ssl))
 			{
@@ -43,16 +63,21 @@ class Kohana_Database_PostgreSQL extends Database
 					$info .= " sslmode='$ssl'";
 				}
 			}
-		}
 
-		// Clear the connection parameters for security
-		unset($this->_config['connection']);
+			$this->_config['connection']['info'] = $info;
+		}
+	}
+
+	public function connect()
+	{
+		if ($this->_connection)
+			return;
 
 		try
 		{
-			$this->_connection = empty($persistent)
-				? pg_connect($info, PGSQL_CONNECT_FORCE_NEW)
-				: pg_pconnect($info, PGSQL_CONNECT_FORCE_NEW);
+			$this->_connection = empty($this->_config['connection']['persistent'])
+				? pg_connect($this->_config['connection']['info'], PGSQL_CONNECT_FORCE_NEW)
+				: pg_pconnect($this->_config['connection']['info'], PGSQL_CONNECT_FORCE_NEW);
 		}
 		catch (ErrorException $e)
 		{
