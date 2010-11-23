@@ -133,6 +133,25 @@ class Kohana_Database_PostgreSQL extends Database
 			throw new Database_Exception(pg_last_error($this->_connection));
 	}
 
+	/**
+	 * Execute a PostgreSQL command
+	 *
+	 * @param   string  SQL command
+	 * @return  boolean
+	 */
+	protected function _command($sql)
+	{
+		$this->_connection or $this->connect();
+
+		if ( ! pg_send_query($this->_connection, $sql))
+			throw new Database_Exception(pg_last_error($this->_connection));
+
+		if ( ! $result = pg_get_result($this->_connection))
+			throw new Database_Exception(pg_last_error($this->_connection));
+
+		return (pg_result_status($result) === PGSQL_COMMAND_OK);
+	}
+
 	public function query($type, $sql, $as_object)
 	{
 		$this->_connection or $this->connect();
@@ -221,6 +240,46 @@ class Kohana_Database_PostgreSQL extends Database
 
 			throw $e;
 		}
+	}
+
+	/**
+	 * Start a SQL transaction
+	 *
+	 * @link http://www.postgresql.org/docs/current/static/sql-set-transaction.html
+	 *
+	 * @param   string  Transaction mode
+	 * @return  boolean
+	 */
+	public function begin($mode = NULL)
+	{
+		return $this->_command("BEGIN $mode");
+	}
+
+	public function commit()
+	{
+		return $this->_command('COMMIT');
+	}
+
+	/**
+	 * Abort the current transaction or roll back to a savepoint
+	 *
+	 * @param   string  Savepoint name
+	 * @return  boolean
+	 */
+	public function rollback($savepoint = NULL)
+	{
+		return $this->_command($savepoint ? "ROLLBACK TO $savepoint" : 'ROLLBACK');
+	}
+
+	/**
+	 * Define a new savepoint in the current transaction
+	 *
+	 * @param   string  Savepoint name
+	 * @return  boolean
+	 */
+	public function savepoint($name)
+	{
+		return $this->_command("SAVEPOINT $name");
 	}
 
 	/**
