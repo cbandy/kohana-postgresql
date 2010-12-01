@@ -239,13 +239,14 @@ class Kohana_Database_PostgreSQL extends Database
 		return $this->query(Database::SELECT, $sql, FALSE)->as_array(NULL, 'table_name');
 	}
 
-	public function list_columns($table, $like = NULL)
+	public function list_columns($table, $like = NULL, $add_prefix = TRUE)
 	{
 		$this->_connection or $this->connect();
 
 		$sql = 'SELECT column_name, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, datetime_precision'
 			.' FROM information_schema.columns'
-			.' WHERE table_schema = '.$this->quote($this->schema()).' AND table_name = '.$this->quote($table);
+			.' WHERE table_schema = '.$this->quote($this->schema())
+			.' AND table_name = '.$this->quote($add_prefix ? ($this->table_prefix().$table) : $table);
 
 		if (is_string($like))
 		{
