@@ -101,7 +101,7 @@ class Kohana_Database_PostgreSQL extends Database
 			throw new Database_Exception(pg_last_error($this->_connection));
 	}
 
-	public function query($type, $sql, $as_object)
+	public function query($type, $sql, $as_object = FALSE, array $params = NULL)
 	{
 		$this->_connection or $this->connect();
 
@@ -157,7 +157,7 @@ class Kohana_Database_PostgreSQL extends Database
 			$this->last_query = $sql;
 
 			if ($type === Database::SELECT)
-				return new Database_PostgreSQL_Result($result, $sql, $as_object, $rows);
+				return new Database_PostgreSQL_Result($result, $sql, $as_object, $params, $rows);
 
 			if ($type === Database::INSERT)
 			{
