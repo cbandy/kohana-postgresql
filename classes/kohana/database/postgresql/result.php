@@ -10,9 +10,9 @@
  */
 class Kohana_Database_PostgreSQL_Result extends Database_Result
 {
-	public function __construct($result, $sql, $as_object, $total_rows = NULL)
+	public function __construct($result, $sql, $as_object = FALSE, $params = NULL, $total_rows = NULL)
 	{
-		parent::__construct($result, $sql, $as_object);
+		parent::__construct($result, $sql, $as_object, $params);
 
 		if ($as_object === TRUE)
 		{
@@ -103,7 +103,10 @@ class Kohana_Database_PostgreSQL_Result extends Database_Result
 		if ( ! $this->_as_object)
 			return pg_fetch_assoc($this->_result, $this->_current_row);
 
-		return pg_fetch_object($this->_result, $this->_current_row, $this->_as_object);
+		if ( ! $this->_object_params)
+			return pg_fetch_object($this->_result, $this->_current_row, $this->_as_object);
+
+		return pg_fetch_object($this->_result, $this->_current_row, $this->_as_object, $this->_object_params);
 	}
 
 }
