@@ -229,6 +229,34 @@ class Kohana_Database_PostgreSQL extends Database
 				return array($insert_id, $rows);
 			}
 
+			while ($result = pg_get_result($this->_connection))
+			{
+				switch (pg_result_status($result))
+				{
+					case PGSQL_COMMAND_OK:
+						$rows += pg_affected_rows($result);
+					break;
+					case PGSQL_TUPLES_OK:
+						$rows += pg_num_rows($result);
+					break;
+					case PGSQL_BAD_RESPONSE:
+					case PGSQL_NONFATAL_ERROR:
+					case PGSQL_FATAL_ERROR:
+						throw new Database_Exception(':error [ :query ]',
+							array(':error' => pg_result_error($result), ':query' => $sql));
+					case PGSQL_COPY_OUT:
+					case PGSQL_COPY_IN:
+						pg_end_copy($this->_connection);
+
+						throw new Database_Exception('PostgreSQL COPY operations not supported [ :query ]',
+							array(':query' => $sql));
+					default:
+						// Nothing
+				}
+
+				pg_free_result($result);
+			}
+
 			return $rows;
 		}
 		catch (Exception $e)
