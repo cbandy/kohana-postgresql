@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php defined('SYSPATH') OR die('No direct script access.');
 
 /**
  * PostgreSQL database connection.
@@ -127,7 +127,7 @@ class Kohana_Database_PostgreSQL extends Database
 
 	public function set_charset($charset)
 	{
-		$this->_connection or $this->connect();
+		$this->_connection OR $this->connect();
 
 		if (pg_set_client_encoding($this->_connection, $charset) !== 0)
 			throw new Database_Exception(pg_last_error($this->_connection));
@@ -136,12 +136,12 @@ class Kohana_Database_PostgreSQL extends Database
 	/**
 	 * Execute a PostgreSQL command
 	 *
-	 * @param   string  SQL command
+	 * @param   string  $sql    SQL command
 	 * @return  boolean
 	 */
 	protected function _command($sql)
 	{
-		$this->_connection or $this->connect();
+		$this->_connection OR $this->connect();
 
 		if ( ! pg_send_query($this->_connection, $sql))
 			throw new Database_Exception(pg_last_error($this->_connection));
@@ -154,7 +154,7 @@ class Kohana_Database_PostgreSQL extends Database
 
 	public function query($type, $sql, $as_object = FALSE, array $params = NULL)
 	{
-		$this->_connection or $this->connect();
+		$this->_connection OR $this->connect();
 
 		if (Kohana::$profiling)
 		{
@@ -253,7 +253,7 @@ class Kohana_Database_PostgreSQL extends Database
 	 *
 	 * @link http://www.postgresql.org/docs/current/static/sql-set-transaction.html
 	 *
-	 * @param   string  Transaction mode
+	 * @param   string  $mode   Transaction mode
 	 * @return  boolean
 	 */
 	public function begin($mode = NULL)
@@ -269,7 +269,7 @@ class Kohana_Database_PostgreSQL extends Database
 	/**
 	 * Abort the current transaction or roll back to a savepoint
 	 *
-	 * @param   string  Savepoint name
+	 * @param   string  $savepoint  Savepoint name
 	 * @return  boolean
 	 */
 	public function rollback($savepoint = NULL)
@@ -280,7 +280,7 @@ class Kohana_Database_PostgreSQL extends Database
 	/**
 	 * Define a new savepoint in the current transaction
 	 *
-	 * @param   string  Savepoint name
+	 * @param   string  $name   Savepoint name
 	 * @return  boolean
 	 */
 	public function savepoint($name)
@@ -328,7 +328,7 @@ class Kohana_Database_PostgreSQL extends Database
 
 	public function list_tables($like = NULL)
 	{
-		$this->_connection or $this->connect();
+		$this->_connection OR $this->connect();
 
 		$sql = 'SELECT table_name FROM information_schema.tables WHERE table_schema = '.$this->quote($this->schema());
 
@@ -342,7 +342,7 @@ class Kohana_Database_PostgreSQL extends Database
 
 	public function list_columns($table, $like = NULL, $add_prefix = TRUE)
 	{
-		$this->_connection or $this->connect();
+		$this->_connection OR $this->connect();
 
 		$sql = 'SELECT column_name, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, datetime_precision'
 			.' FROM information_schema.columns'
@@ -377,7 +377,7 @@ class Kohana_Database_PostgreSQL extends Database
 
 	public function escape($value)
 	{
-		$this->_connection or $this->connect();
+		$this->_connection OR $this->connect();
 
 		$value = pg_escape_string($this->_connection, $value);
 
