@@ -12,7 +12,7 @@ class Kohana_Database_PostgreSQL extends Database
 {
 	protected $_version;
 
-	protected function __construct($name, $config)
+	public function __construct($name, $config)
 	{
 		parent::__construct($name, $config);
 
